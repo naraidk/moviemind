@@ -18,8 +18,6 @@ const API_BASE_URLS = [
   'http://localhost:5010',
 ];
 
-const STORAGE_KEY = 'moviemind-state-v1';
-
 const uniqueById = <T extends { id: number }>(items: T[]) =>
   [...new Map(items.map((item) => [item.id, item])).values()];
 
@@ -30,40 +28,11 @@ type CustomMovieList = {
 };
 
 export default function App() {
-  const loadPersistedState = () => {
-    try {
-      const storedState = localStorage.getItem(STORAGE_KEY);
-
-      if (!storedState) {
-        return {
-          watchedMovies: [],
-          watchlistMovies: [],
-          favoriteMovies: [],
-          customLists: [],
-        };
-      }
-
-      const parsedState = JSON.parse(storedState) as {
-        watchedMovies?: MovieRecommendation[];
-        watchlistMovies?: MovieRecommendation[];
-        favoriteMovies?: MovieRecommendation[];
-        customLists?: CustomMovieList[];
-      };
-
-      return {
-        watchedMovies: parsedState.watchedMovies ?? [],
-        watchlistMovies: parsedState.watchlistMovies ?? [],
-        favoriteMovies: parsedState.favoriteMovies ?? [],
-        customLists: parsedState.customLists ?? [],
-      };
-    } catch {
-      return {
-        watchedMovies: [],
-        watchlistMovies: [],
-        favoriteMovies: [],
-        customLists: [],
-      };
-    }
+  const defaultMovieState = {
+    watchedMovies: [],
+    watchlistMovies: [],
+    favoriteMovies: [],
+    customLists: [],
   };
 
   const [currentMovie, setCurrentMovie] = useState<MovieRecommendation | null>(null);
@@ -72,30 +41,87 @@ export default function App() {
   const [movieQueueIndex, setMovieQueueIndex] = useState(0);
   const [showQueueEndedModal, setShowQueueEndedModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [watchedMovies, setWatchedMovies] = useState<MovieRecommendation[]>(() => loadPersistedState().watchedMovies);
-  const [watchlistMovies, setWatchlistMovies] = useState<MovieRecommendation[]>(() => loadPersistedState().watchlistMovies);
-  const [favoriteMovies, setFavoriteMovies] = useState<MovieRecommendation[]>(() => loadPersistedState().favoriteMovies);
-  const [customLists, setCustomLists] = useState<CustomMovieList[]>(() => loadPersistedState().customLists);
+  const [watchedMovies, setWatchedMovies] = useState<MovieRecommendation[]>([]);
+  const [watchlistMovies, setWatchlistMovies] = useState<MovieRecommendation[]>([]);
+  const [favoriteMovies, setFavoriteMovies] = useState<MovieRecommendation[]>([]);
+  const [customLists, setCustomLists] = useState<CustomMovieList[]>([]);
   const [showLists, setShowLists] = useState<'watched' | 'watchlist' | 'favorites' | string | null>(null);
   const [customListNameDraft, setCustomListNameDraft] = useState('');
   const [movieSearchResults, setMovieSearchResults] = useState<
     Array<{ id: number; title: string; year: number; posterUrl: string }>
   >([]);
 
-  useEffect(() => {
+  const syncMovieLists = async (nextState: {
+    watchedMovies: MovieRecommendation[];
+    watchlistMovies: MovieRecommendation[];
+    favoriteMovies: MovieRecommendation[];
+    customLists: CustomMovieList[];
+  }) => {
     try {
-      localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify({
-          watchedMovies,
-          watchlistMovies,
-          favoriteMovies,
-          customLists,
-        })
-      );
-    } catch {
-      // ignore localStorage write failures
+      const baseUrl = await getLiveApiBaseUrl();
+      const res = await fetch(`${baseUrl}/api/movie-lists`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(nextState),
+      });
+
+      if (!res.ok) {
+        throw new Error('Failed to sync movie lists');
+      }
+    } catch (error) {
+      console.error('Failed to sync movie lists with MongoDB:', error);
     }
+  };
+
+  useEffect(() => {
+    const loadMovieLists = async () => {
+      try {
+        const baseUrl = await getLiveApiBaseUrl();
+        const res = await fetch(`${baseUrl}/api/movie-lists`);
+
+        if (!res.ok) {
+          throw new Error('Failed to load movie lists');
+        }
+
+        const data = (await res.json()) as {
+          watchedMovies?: MovieRecommendation[];
+          watchlistMovies?: MovieRecommendation[];
+          favoriteMovies?: MovieRecommendation[];
+          customLists?: CustomMovieList[];
+        };
+
+        setWatchedMovies(data.watchedMovies ?? []);
+        setWatchlistMovies(data.watchlistMovies ?? []);
+        setFavoriteMovies(data.favoriteMovies ?? []);
+        setCustomLists(data.customLists ?? []);
+      } catch (error) {
+        console.error('Failed to load movie lists from MongoDB:', error);
+        setWatchedMovies(defaultMovieState.watchedMovies);
+        setWatchlistMovies(defaultMovieState.watchlistMovies);
+        setFavoriteMovies(defaultMovieState.favoriteMovies);
+        setCustomLists(defaultMovieState.customLists);
+      }
+    };
+
+    loadMovieLists();
+  }, []);
+
+  useEffect(() => {
+    if (
+      watchedMovies.length === 0 &&
+      watchlistMovies.length === 0 &&
+      favoriteMovies.length === 0 &&
+      customLists.length === 0
+    ) {
+      return;
+    }
+
+    syncMovieLists({
+      watchedMovies,
+      watchlistMovies,
+      favoriteMovies,
+      customLists,
+    });
   }, [watchedMovies, watchlistMovies, favoriteMovies, customLists]);
   const [newMovieDraft, setNewMovieDraft] = useState({
     title: '',

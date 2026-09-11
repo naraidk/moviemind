@@ -1,75 +1,65 @@
-# React + TypeScript + Vite
+## MovieMind — A Smart Movie Recommendation App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+MovieMind is a movie recommendation app designed to help users discover films that match their mood, energy, context, and taste in just a few clicks. Instead of endlessly browsing, users can get curated suggestions, save their favorite picks, build custom lists, and explore trailers for the films they want to watch next.
 
-Currently, two official plugins are available:
+I built MovieMind using React, TypeScript, Vite, Express, Node.js, Google GenAI, TMDB, and local persistence for movie lists.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## MovieMind — Application intelligente de recommandation de films
 
-## React Compiler
+MovieMind est une application de recommandation de films conçue pour aider les utilisateurs à découvrir des films qui correspondent à leur humeur, à leur énergie, à leur contexte et à leurs goûts en quelques clics. Plutôt que de parcourir sans fin des catalogues, les utilisateurs peuvent obtenir des suggestions personnalisées, enregistrer leurs films préférés, créer des listes sur mesure et regarder les bandes-annonces des films qu’ils veulent voir ensuite.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+J'ai développé MovieMind en utilisant React, TypeScript, Vite, Express, Node.js, Google GenAI, TMDB et une persistance locale pour les listes de films.
 
-## Expanding the ESLint configuration
+## Technologies
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- React
+- TypeScript
+- Vite
+- Express
+- Node.js
+- Google GenAI
+- TMDB API
+- Lucide React
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Features
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+MovieMind comes with everything you’d expect from a modern, mood-driven movie discovery app:
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- Mood-based movie recommendations
+- Extra filters such as genre, year, cinema, country, and Hollywood preference
+- Automatic weather detection for contextual suggestions
+- Personalized movie lists (`Déjà vu`, `À voir`, `Favoris`, and custom lists)
+- Movie trailer support
+- Custom list management with add, edit, and delete actions
+- Local persistence so users can keep their saved lists between sessions
 
-```
+## The Process
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+We started by imagining a movie app that could feel personal and intuitive rather than overwhelming. First came the recommendation flow, then the list system, so users could save and organize films in a way that felt natural. After that, we added richer controls like genre filters, country preferences, and weather-aware suggestions to make recommendations more contextual.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+The backend was built with Express and Node.js, using Google GenAI to shape the recommendation prompt and TMDB to fetch movie data, trailers, and metadata. On the frontend, React + TypeScript + Vite made it possible to build a fast, responsive experience with reusable components and smooth interactions.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## What I Learned
 
-```
+This project helped me grow in several areas:
+
+- Building a full-stack app with React and Express
+- Integrating AI-powered recommendation logic with Google GenAI
+- Working with external APIs like TMDB for content discovery and media data
+- Designing a clean UX for movie discovery and list management
+- Structuring a multi-feature app with reusable frontend components
+- Improving local state management and persistence for a prototype product
+
+## What Could Be Improved
+
+- Add user accounts and saved profiles
+- Improve recommendation quality with stronger scoring and filtering logic
+- Add notification or “watch later” reminders
+- Expand the app with favorites, social sharing, and collaborative lists
+- Improve visual polish with richer animations and a stronger mobile experience
+
+![MovieMind hero](./src/assets/hero.png)
+
+## Demo
+
+https://github.com/user-attachments/assets/6a23d1ec-d833-4f67-a7a3-909f2b593b62

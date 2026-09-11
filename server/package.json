@@ -16,6 +16,8 @@
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "mongodb": "^6.21.0",
+    "mongodb-memory-server": "^10.4.3",
     "node-fetch": "^3.3.2"
   },
   "devDependencies": {

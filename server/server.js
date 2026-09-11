@@ -2,8 +2,11 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import net from 'net';
+import { MongoClient } from 'mongodb';
+import { MongoMemoryServer } from 'mongodb-memory-server';
 import { GoogleGenAI, Type } from '@google/genai';
 
+dotenv.config({ path: new URL('../.env', import.meta.url).pathname });
 dotenv.config({ path: new URL('.env', import.meta.url).pathname });
 
 const app = express();
@@ -13,12 +16,101 @@ app.use(express.json());
 
 const apiKey = process.env.GEMINI_API_KEY;
 const tmdbKey = process.env.TMDB_API_KEY;
+const mongoUri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/moviemind';
+
+let mongoClient;
+let movieListsCollection;
+let memoryServer;
+
+const initMongoConnection = async () => {
+  if (movieListsCollection) {
+    return movieListsCollection;
+  }
+
+  try {
+    mongoClient = new MongoClient(mongoUri);
+    await mongoClient.connect();
+    movieListsCollection = mongoClient.db('moviemind').collection('movieLists');
+    return movieListsCollection;
+  } catch {
+    memoryServer = await MongoMemoryServer.create();
+    mongoClient = new MongoClient(memoryServer.getUri());
+    await mongoClient.connect();
+    movieListsCollection = mongoClient.db('moviemind').collection('movieLists');
+    return movieListsCollection;
+  }
+};
+
+const defaultMovieState = {
+  watchedMovies: [],
+  watchlistMovies: [],
+  favoriteMovies: [],
+  customLists: [],
+};
+
+const normalizeMovieState = (state = {}) => ({
+  watchedMovies: Array.isArray(state.watchedMovies) ? state.watchedMovies : [],
+  watchlistMovies: Array.isArray(state.watchlistMovies) ? state.watchlistMovies : [],
+  favoriteMovies: Array.isArray(state.favoriteMovies) ? state.favoriteMovies : [],
+  customLists: Array.isArray(state.customLists) ? state.customLists : [],
+});
+
+const ensureMovieListsCollection = async () => {
+  if (!movieListsCollection) {
+    await initMongoConnection();
+  }
+
+  return movieListsCollection;
+};
 
 const ai = new GoogleGenAI({ apiKey: apiKey || '' });
 
 // 1. Route de test basique
 app.get('/api/ping', (_req, res) => {
   res.json({ status: 'ok', message: 'Serveur Express actif' });
+});
+
+app.get('/api/movie-lists', async (_req, res) => {
+  try {
+    const collection = await ensureMovieListsCollection();
+    const existingState = await collection.findOne({ _id: 'default' });
+
+    if (!existingState) {
+      const newState = { _id: 'default', ...defaultMovieState };
+      await collection.insertOne(newState);
+      return res.json(normalizeMovieState(newState));
+    }
+
+    return res.json(normalizeMovieState(existingState));
+  } catch (error) {
+    console.error('Erreur lecture MongoDB :', error);
+    const msg = error instanceof Error ? error.message : 'Erreur serveur';
+    return res.status(500).json({ error: `Impossible de lire les listes depuis MongoDB: ${msg}` });
+  }
+});
+
+app.put('/api/movie-lists', async (req, res) => {
+  try {
+    const collection = await ensureMovieListsCollection();
+    const payload = normalizeMovieState(req.body);
+
+    await collection.updateOne(
+      { _id: 'default' },
+      {
+        $set: {
+          _id: 'default',
+          ...payload,
+        },
+      },
+      { upsert: true }
+    );
+
+    return res.json(payload);
+  } catch (error) {
+    console.error('Erreur écriture MongoDB :', error);
+    const msg = error instanceof Error ? error.message : 'Erreur serveur';
+    return res.status(500).json({ error: `Impossible d'écrire les listes dans MongoDB: ${msg}` });
+  }
 });
 
 app.get('/api/search-movies', async (req, res) => {
