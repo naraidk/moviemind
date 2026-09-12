@@ -1,3 +1,4 @@
+<img width="1082" height="817" alt="Image" src="https://github.com/user-attachments/assets/fc5a8d9c-4c8d-4ff6-9f59-9c65f75f9d4e" />
 ## MovieMind — A Smart Movie Recommendation App
 
 MovieMind is a movie recommendation app designed to help users discover films that match their mood, energy, context, and taste in just a few clicks. Instead of endlessly browsing, users can get curated suggestions, save their favorite picks, build custom lists, and explore trailers for the films they want to watch next.
@@ -9,7 +10,7 @@ I built MovieMind using React, TypeScript, Vite, Express, Node.js, Google GenAI,
 MovieMind est une application de recommandation de films conçue pour aider les utilisateurs à découvrir des films qui correspondent à leur humeur, à leur énergie, à leur contexte et à leurs goûts en quelques clics. Plutôt que de parcourir sans fin des catalogues, les utilisateurs peuvent obtenir des suggestions personnalisées, enregistrer leurs films préférés, créer des listes sur mesure et regarder les bandes-annonces des films qu’ils veulent voir ensuite.
 
 J'ai développé MovieMind en utilisant React, TypeScript, Vite, Express, Node.js, Google GenAI, TMDB et une persistance locale pour les listes de films.
-<img width="1082" height="817" alt="Image" src="https://github.com/user-attachments/assets/fc5a8d9c-4c8d-4ff6-9f59-9c65f75f9d4e" />
+
 ## Technologies
 
 - React
