@@ -1,4 +1,5 @@
 <img width="1082" height="817" alt="Image" src="https://github.com/user-attachments/assets/fc5a8d9c-4c8d-4ff6-9f59-9c65f75f9d4e" />
+
 ## MovieMind — A Smart Movie Recommendation App
 
 MovieMind is a movie recommendation app designed to help users discover films that match their mood, energy, context, and taste in just a few clicks. Instead of endlessly browsing, users can get curated suggestions, save their favorite picks, build custom lists, and explore trailers for the films they want to watch next.
