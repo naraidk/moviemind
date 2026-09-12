@@ -58,8 +58,6 @@ This project helped me grow in several areas:
 - Expand the app with favorites, social sharing, and collaborative lists
 - Improve visual polish with richer animations and a stronger mobile experience
 
-![MovieMind hero](./src/assets/hero.png)
-
 ## Demo
 
-https://github.com/user-attachments/assets/6a23d1ec-d833-4f67-a7a3-909f2b593b62
+https://github.com/user-attachments/assets/f4e95e64-27a8-4d16-b8a0-9696472acf8a
